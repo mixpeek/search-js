@@ -22,7 +22,7 @@
   --mixpeek-radius: 12px;
   --mixpeek-radius-sm: 8px;
   --mixpeek-radius-xs: 6px;
-  --mixpeek-backdrop: rgba(15, 23, 42, 0.75);
+  --mixpeek-backdrop: rgba(15, 23, 42, 0.92);
   --mixpeek-highlight-bg: rgba(var(--mixpeek-accent-rgb), 0.15);
   --mixpeek-highlight-text: var(--mixpeek-accent);
   --mixpeek-skeleton-bg: #e5e7eb;
@@ -53,7 +53,7 @@
   --mixpeek-text-tertiary: #9ca3af;
   --mixpeek-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
   --mixpeek-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --mixpeek-backdrop: rgba(0, 0, 0, 0.8);
+  --mixpeek-backdrop: rgba(0, 0, 0, 0.9);
   --mixpeek-skeleton-bg: #374151;
   --mixpeek-skeleton-shine: #4b5563;
   --mixpeek-error-bg: #451a1a;
@@ -131,8 +131,8 @@
   justify-content: center;
   padding-top: min(120px, 15vh);
   background: var(--mixpeek-backdrop);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   animation: mixpeek-backdrop-in 0.15s ease-out;
 }
 
