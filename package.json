@@ -1,0 +1,65 @@
+{
+  "name": "@mixpeek/search-js",
+  "version": "0.1.0",
+  "description": "Drop-in multimodal search widget — add AI-powered search to any site in 6 lines of code",
+  "main": "dist/mixpeek-search.cjs.js",
+  "module": "dist/mixpeek-search.esm.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/mixpeek-search.esm.js",
+      "require": "./dist/mixpeek-search.cjs.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./styles.css": "./dist/style.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint src --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.3.0",
+    "vite": "^5.0.0",
+    "vite-plugin-css-injected-by-js": "^3.3.0",
+    "vite-plugin-dts": "^3.7.0"
+  },
+  "keywords": [
+    "mixpeek",
+    "search",
+    "search-widget",
+    "react",
+    "multimodal-search",
+    "ai-search",
+    "docsearch",
+    "site-search",
+    "cmd-k",
+    "semantic-search"
+  ],
+  "license": "MIT",
+  "author": "Mixpeek <hello@mixpeek.com> (https://mixpeek.com)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mixpeek/search-js.git"
+  },
+  "homepage": "https://mixpeek.com/search",
+  "bugs": {
+    "url": "https://github.com/mixpeek/search-js/issues"
+  }
+}
