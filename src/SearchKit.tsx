@@ -429,6 +429,7 @@ export const SearchKit: React.FC<SearchKitProps> = ({
           onResultClick={onResultClick}
           renderResult={renderResult}
           ctaConfig={ctaConfig}
+          theme={resolvedTheme}
         />
       </div>
     </SearchContext.Provider>

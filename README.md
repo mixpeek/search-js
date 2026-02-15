@@ -215,7 +215,7 @@ Use `transformResults` to map your retriever's fields to the widget format:
 ## Links
 
 - [Connector page](https://mxp.co/searchkit)
-- [GitHub](https://github.com/mixpeek/react-searchkit)
+- [GitHub](https://github.com/mixpeek/searchkit)
 - [npm](https://www.npmjs.com/package/@mixpeek/react-searchkit)
 - [Docs](https://mixpeek.com/docs)
 

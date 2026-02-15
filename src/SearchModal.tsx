@@ -30,6 +30,7 @@ interface SearchModalProps {
   onResultClick?: (result: SearchResult, index: number) => void;
   renderResult?: (result: SearchResult, index: number) => ReactNode;
   ctaConfig?: CTAConfig;
+  theme?: string;
 }
 
 export const SearchModal: React.FC<SearchModalProps> = ({
@@ -53,6 +54,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   onResultClick,
   renderResult,
   ctaConfig,
+  theme = "light",
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const backdropRef = useRef<HTMLDivElement>(null);
@@ -151,7 +153,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   const modalContent = (
     <div
       ref={backdropRef}
-      className="mixpeek-modal-backdrop"
+      className={`mixpeek-search mixpeek-theme-${theme} mixpeek-modal-backdrop`}
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
