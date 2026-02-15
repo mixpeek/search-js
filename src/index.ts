@@ -59,6 +59,9 @@ export type {
   ThemeMode,
   Position,
   RecentSearch,
+  StageEvent,
+  StageStatistics,
+  StageGroup,
 } from "./types";
 
 // ---------- CDN Auto-Init ----------

@@ -929,6 +929,261 @@
   }
 }
 
+/* ---------- Pipeline Tracker ---------- */
+.mixpeek-pipeline {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 8px 16px 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.mixpeek-pipeline::-webkit-scrollbar {
+  display: none;
+}
+
+.mixpeek-pipeline-stage {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--mixpeek-text-tertiary);
+  background: var(--mixpeek-bg-secondary);
+  border: 1px solid var(--mixpeek-border);
+  transition: all 0.2s ease;
+}
+
+.mixpeek-pipeline-stage[data-status="complete"] {
+  color: var(--mixpeek-accent);
+  border-color: rgba(var(--mixpeek-accent-rgb), 0.25);
+  background: rgba(var(--mixpeek-accent-rgb), 0.06);
+}
+
+.mixpeek-pipeline-stage[data-status="running"] {
+  color: var(--mixpeek-accent);
+  border-color: rgba(var(--mixpeek-accent-rgb), 0.3);
+  background: rgba(var(--mixpeek-accent-rgb), 0.08);
+}
+
+.mixpeek-pipeline-stage[data-status="error"] {
+  color: var(--mixpeek-error-text);
+  border-color: var(--mixpeek-error-border);
+  background: var(--mixpeek-error-bg);
+}
+
+.mixpeek-pipeline-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mixpeek-pipeline-stage[data-status="running"] .mixpeek-pipeline-dot {
+  background: var(--mixpeek-accent);
+  animation: mixpeek-pulse 1.5s ease-in-out infinite;
+}
+
+.mixpeek-pipeline-stage[data-status="complete"] .mixpeek-pipeline-dot {
+  color: var(--mixpeek-accent);
+}
+
+.mixpeek-pipeline-stage[data-status="error"] .mixpeek-pipeline-dot {
+  color: var(--mixpeek-error-text);
+}
+
+.mixpeek-pipeline-stage[data-status="pending"] .mixpeek-pipeline-dot {
+  background: var(--mixpeek-border);
+}
+
+.mixpeek-pipeline-label {
+  white-space: nowrap;
+}
+
+.mixpeek-pipeline-count {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 0 5px;
+  background: rgba(var(--mixpeek-accent-rgb), 0.12);
+  color: var(--mixpeek-accent);
+  border-radius: 9999px;
+  line-height: 1.6;
+}
+
+.mixpeek-pipeline-connector {
+  width: 16px;
+  height: 1px;
+  background: var(--mixpeek-border);
+  flex-shrink: 0;
+}
+
+.mixpeek-pipeline-connector-active {
+  background: linear-gradient(90deg, rgba(var(--mixpeek-accent-rgb), 0.4), transparent);
+  animation: mixpeek-pulse 1.5s ease-in-out infinite;
+}
+
+/* ---------- Result Header (title + score) ---------- */
+.mixpeek-result-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.mixpeek-result-header .mixpeek-result-title {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---------- Score Badge ---------- */
+.mixpeek-result-score {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--mixpeek-accent);
+  background: rgba(var(--mixpeek-accent-rgb), 0.1);
+  border-radius: 9999px;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+/* ---------- Result Footer (reference + meta toggle) ---------- */
+.mixpeek-result-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* ---------- Reference ---------- */
+.mixpeek-result-ref {
+  font-size: 11px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  color: var(--mixpeek-text-tertiary);
+  opacity: 0.7;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+}
+
+/* ---------- Metadata Toggle ---------- */
+.mixpeek-meta-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  margin: 0;
+  background: none;
+  border: none;
+  font-size: 11px;
+  font-family: inherit;
+  color: var(--mixpeek-text-tertiary);
+  cursor: pointer;
+  border-radius: var(--mixpeek-radius-xs);
+  transition: color 0.1s ease, background 0.1s ease;
+  flex-shrink: 0;
+}
+
+.mixpeek-meta-toggle:hover {
+  color: var(--mixpeek-text-secondary);
+  background: var(--mixpeek-bg-tertiary);
+}
+
+.mixpeek-meta-chevron {
+  transition: transform 0.15s ease;
+}
+
+.mixpeek-meta-chevron-open {
+  transform: rotate(90deg);
+}
+
+/* ---------- Metadata Panel ---------- */
+.mixpeek-result-metadata {
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: var(--mixpeek-bg-secondary);
+  border: 1px solid var(--mixpeek-border);
+  border-radius: var(--mixpeek-radius-xs);
+  animation: mixpeek-meta-expand 0.15s ease-out;
+}
+
+@keyframes mixpeek-meta-expand {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mixpeek-meta-row {
+  display: flex;
+  gap: 8px;
+  padding: 2px 0;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.mixpeek-meta-row + .mixpeek-meta-row {
+  border-top: 1px solid var(--mixpeek-border);
+  padding-top: 3px;
+  margin-top: 1px;
+}
+
+.mixpeek-meta-key {
+  flex-shrink: 0;
+  font-weight: 500;
+  color: var(--mixpeek-text-tertiary);
+  min-width: 80px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+.mixpeek-meta-value {
+  color: var(--mixpeek-text-secondary);
+  word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 60px;
+}
+
+/* ---------- Result Card Fade-in ---------- */
+.mixpeek-results-list .mixpeek-result-card {
+  animation: mixpeek-result-in 0.2s ease-out both;
+}
+
+@keyframes mixpeek-result-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Stagger animations for sequential appearance */
+.mixpeek-results-list .mixpeek-result-card:nth-child(1) { animation-delay: 0s; }
+.mixpeek-results-list .mixpeek-result-card:nth-child(2) { animation-delay: 0.03s; }
+.mixpeek-results-list .mixpeek-result-card:nth-child(3) { animation-delay: 0.06s; }
+.mixpeek-results-list .mixpeek-result-card:nth-child(4) { animation-delay: 0.09s; }
+.mixpeek-results-list .mixpeek-result-card:nth-child(5) { animation-delay: 0.12s; }
+.mixpeek-results-list .mixpeek-result-card:nth-child(n+6) { animation-delay: 0.15s; }
+
 /* ---------- Print ---------- */
 @media print {
   .mixpeek-modal-backdrop {

@@ -5,6 +5,7 @@ import {
   AIAnswerData,
   SearchResponseMetadata,
   MixpeekSearchConfig,
+  StageGroup,
 } from "../types";
 
 interface UseSearchOptions {
@@ -17,7 +18,9 @@ interface UseSearchOptions {
 
 interface UseSearchReturn {
   results: SearchResult[];
+  stages: StageGroup[];
   isLoading: boolean;
+  isStreaming: boolean;
   error: string | null;
   aiAnswer: AIAnswerData | null;
   metadata: SearchResponseMetadata | null;
@@ -50,7 +53,9 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
   const { config, onSearch, onSearchExecuted, onZeroResults, transformResults } = options;
 
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [stages, setStages] = useState<StageGroup[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [aiAnswer, setAiAnswer] = useState<AIAnswerData | null>(null);
   const [metadata, setMetadata] = useState<SearchResponseMetadata | null>(null);
@@ -79,10 +84,12 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
 
       if (!trimmed) {
         setResults([]);
+        setStages([]);
         setError(null);
         setAiAnswer(null);
         setMetadata(null);
         setIsLoading(false);
+        setIsStreaming(false);
         return;
       }
 
@@ -97,41 +104,105 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
         setResults(transformedResults);
         setAiAnswer(cached.aiAnswer);
         setMetadata(cached.metadata);
+        setStages([]);
         setError(null);
         setIsLoading(false);
+        setIsStreaming(false);
         return;
       }
 
       setIsLoading(true);
+      setIsStreaming(true);
       setError(null);
+      setStages([]);
+      setResults([]);
+      setAiAnswer(null);
 
       try {
         onSearch?.(trimmed);
 
-        const response = await client.search({
-          query: trimmed,
-          limit: config.maxResults,
-        });
+        let finalResults: SearchResult[] = [];
 
-        const rawResults = response.results || [];
+        for await (const event of client.searchStream({ query: trimmed, limit: config.maxResults })) {
+          switch (event.event_type) {
+            case "stage_start":
+              setStages((prev) => {
+                const next = [...prev];
+                next[event.stage_index!] = {
+                  name: event.stage_name || `Stage ${event.stage_index}`,
+                  index: event.stage_index!,
+                  status: "running",
+                  documents: [],
+                };
+                return next;
+              });
+              break;
+
+            case "stage_complete":
+              setStages((prev) => {
+                const next = [...prev];
+                const existing = next[event.stage_index!];
+                next[event.stage_index!] = {
+                  name: existing?.name || event.stage_name || `Stage ${event.stage_index}`,
+                  index: event.stage_index!,
+                  status: "complete",
+                  documents: event.documents || [],
+                  statistics: event.statistics,
+                };
+                return next;
+              });
+              // Show latest stage results as current results
+              if (event.documents) {
+                setResults(
+                  transformResults ? transformResults(event.documents) : event.documents
+                );
+              }
+              break;
+
+            case "stage_error":
+              setStages((prev) => {
+                const next = [...prev];
+                const existing = next[event.stage_index!];
+                next[event.stage_index!] = {
+                  name: existing?.name || event.stage_name || `Stage ${event.stage_index}`,
+                  index: event.stage_index!,
+                  status: "error",
+                  documents: existing?.documents || [],
+                  error: event.error,
+                };
+                return next;
+              });
+              break;
+
+            case "execution_complete":
+              finalResults = event.documents || [];
+              break;
+
+            case "execution_error":
+              setError(event.error || "Execution failed");
+              setIsStreaming(false);
+              setIsLoading(false);
+              return;
+          }
+        }
+
+        // Stream ended — set final results
         const transformedResults = transformResults
-          ? transformResults(rawResults)
-          : rawResults;
+          ? transformResults(finalResults)
+          : finalResults;
+        setResults(transformedResults);
+        setIsStreaming(false);
+        setIsLoading(false);
+        setError(null);
 
-        // Cache the results
+        // Cache the final results
         resultCache.set(cacheKey, {
-          results: rawResults,
-          aiAnswer: response.ai_answer || null,
-          metadata: response.metadata || null,
+          results: finalResults,
+          aiAnswer: null,
+          metadata: null,
           timestamp: Date.now(),
         });
 
-        setResults(transformedResults);
-        setAiAnswer(response.ai_answer || null);
-        setMetadata(response.metadata || null);
-        setError(null);
-
-        // Notify that search executed (for recent searches tracking)
         onSearchExecuted?.(trimmed);
 
         if (transformedResults.length === 0) {
@@ -139,15 +210,54 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
         }
       } catch (err: unknown) {
         if (err instanceof Error && err.name === "AbortError") {
-          // Request was cancelled, ignore
           return;
         }
-        const message = err instanceof Error ? err.message : "Search failed";
-        setError(message);
-        setResults([]);
-        setAiAnswer(null);
+
+        // Fall back to non-streaming search
+        setIsStreaming(false);
+        setStages([]);
+
+        try {
+          const response = await client.search({
+            query: trimmed,
+            limit: config.maxResults,
+          });
+
+          const rawResults = response.results || [];
+          const transformedResults = transformResults
+            ? transformResults(rawResults)
+            : rawResults;
+
+          setResults(transformedResults);
+          setAiAnswer(response.ai_answer || null);
+          setMetadata(response.metadata || null);
+          setError(null);
+
+          resultCache.set(cacheKey, {
+            results: rawResults,
+            aiAnswer: response.ai_answer || null,
+            metadata: response.metadata || null,
+            timestamp: Date.now(),
+          });
+
+          onSearchExecuted?.(trimmed);
+
+          if (transformedResults.length === 0) {
+            onZeroResults?.(trimmed);
+          }
+        } catch (fallbackErr: unknown) {
+          if (fallbackErr instanceof Error && fallbackErr.name === "AbortError") {
+            return;
+          }
+          const message =
+            fallbackErr instanceof Error ? fallbackErr.message : "Search failed";
+          setError(message);
+          setResults([]);
+          setAiAnswer(null);
+        }
       } finally {
         setIsLoading(false);
+        setIsStreaming(false);
       }
     },
     [config.projectKey, config.maxResults, config.apiBaseUrl, onSearch, onSearchExecuted, onZeroResults, transformResults]
@@ -180,5 +290,5 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
     };
   }, []);
 
-  return { results, isLoading, error, aiAnswer, metadata, search };
+  return { results, stages, isLoading, isStreaming, error, aiAnswer, metadata, search };
 }

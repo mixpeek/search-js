@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { SearchResult } from "./types";
 
 interface ResultCardProps {
@@ -49,7 +49,6 @@ function extractDisplayTitle(result: SearchResult): string {
 
 function extractDisplayContent(result: SearchResult): string {
   if (result.content) return result.content;
-  // Look for common content field names
   for (const key of ["description", "snippet", "summary", "text", "body"]) {
     if (typeof result[key] === "string" && result[key]) {
       return result[key] as string;
@@ -58,6 +57,25 @@ function extractDisplayContent(result: SearchResult): string {
   return "";
 }
 
+function formatScore(score: number): string {
+  if (score >= 0 && score <= 1) {
+    return `${Math.round(score * 100)}%`;
+  }
+  return score.toFixed(1);
+}
+
+function formatMetaValue(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  if (value === null || value === undefined) return "";
+  return JSON.stringify(value);
+}
+
+const DISPLAY_FIELDS = new Set([
+  "id", "title", "content", "page_url", "image_url", "score",
+  "document_id", "collection_id", "namespace_id",
+]);
+
 export const ResultCard: React.FC<ResultCardProps> = ({
   result,
   index,
@@ -65,19 +83,32 @@ export const ResultCard: React.FC<ResultCardProps> = ({
   onResultClick,
 }) => {
   const [copyFeedback, setCopyFeedback] = useState(false);
+  const [showMeta, setShowMeta] = useState(false);
 
   const title = extractDisplayTitle(result);
   const content = extractDisplayContent(result);
   const truncatedContent =
     content.length > 200 ? content.slice(0, 200) + "..." : content;
 
+  const reference = (result.document_id as string) || result.id || null;
+
+  const metaEntries = useMemo(() => {
+    const entries: [string, string][] = [];
+    for (const [key, value] of Object.entries(result)) {
+      if (DISPLAY_FIELDS.has(key)) continue;
+      if (key.startsWith("_") || key.startsWith("__")) continue;
+      if (value === null || value === undefined) continue;
+      const formatted = formatMetaValue(value);
+      if (formatted) entries.push([key, formatted]);
+    }
+    return entries;
+  }, [result]);
+
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
       onResultClick?.(result, index);
 
       if (result.page_url) {
-        // Allow default link behavior if it's a real link
-        // but also support custom handlers
         if (onResultClick) {
           e.preventDefault();
         }
@@ -109,10 +140,19 @@ export const ResultCard: React.FC<ResultCardProps> = ({
         setCopyFeedback(true);
         setTimeout(() => setCopyFeedback(false), 2000);
       }).catch(() => {
-        // Clipboard API unavailable (insecure context)
+        // Clipboard API unavailable
       });
     },
     [title, result.page_url]
+  );
+
+  const handleMetaToggle = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+      setShowMeta((prev) => !prev);
+    },
+    []
   );
 
   const Tag = result.page_url ? "a" : "div";
@@ -145,8 +185,15 @@ export const ResultCard: React.FC<ResultCardProps> = ({
       )}
 
       <div className="mixpeek-result-body">
-        <div className="mixpeek-result-title">
-          {highlightText(title, query)}
+        <div className="mixpeek-result-header">
+          <div className="mixpeek-result-title">
+            {highlightText(title, query)}
+          </div>
+          {typeof result.score === "number" && (
+            <span className="mixpeek-result-score">
+              {formatScore(result.score)}
+            </span>
+          )}
         </div>
 
         {result.page_url && (
@@ -156,6 +203,49 @@ export const ResultCard: React.FC<ResultCardProps> = ({
         {truncatedContent && (
           <div className="mixpeek-result-content">
             {highlightText(truncatedContent, query)}
+          </div>
+        )}
+
+        <div className="mixpeek-result-footer">
+          {reference && (
+            <span className="mixpeek-result-ref" title={reference}>
+              {reference}
+            </span>
+          )}
+          {metaEntries.length > 0 && (
+            <button
+              className="mixpeek-meta-toggle"
+              onClick={handleMetaToggle}
+              type="button"
+              aria-expanded={showMeta}
+              aria-label={showMeta ? "Hide details" : "Show details"}
+            >
+              <svg
+                className={`mixpeek-meta-chevron ${showMeta ? "mixpeek-meta-chevron-open" : ""}`}
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+              Details
+            </button>
+          )}
+        </div>
+
+        {showMeta && metaEntries.length > 0 && (
+          <div className="mixpeek-result-metadata">
+            {metaEntries.map(([key, value]) => (
+              <div key={key} className="mixpeek-meta-row">
+                <span className="mixpeek-meta-key">{key}</span>
+                <span className="mixpeek-meta-value">{value}</span>
+              </div>
+            ))}
           </div>
         )}
       </div>

@@ -113,7 +113,7 @@ export const MixpeekSearch: React.FC<MixpeekSearchProps> = ({
   const { recentSearches, addSearch, clearRecentSearches } =
     useRecentSearches();
 
-  const { results, isLoading, error, aiAnswer, metadata, search } = useSearch({
+  const { results, stages, isLoading, isStreaming, error, aiAnswer, metadata, search } = useSearch({
     config,
     onSearch,
     onSearchExecuted: addSearch,
@@ -182,7 +182,9 @@ export const MixpeekSearch: React.FC<MixpeekSearchProps> = ({
       query,
       setQuery: handleQueryChange,
       results,
+      stages,
       isLoading,
+      isStreaming,
       error,
       aiAnswer,
       metadata,
@@ -199,7 +201,9 @@ export const MixpeekSearch: React.FC<MixpeekSearchProps> = ({
       query,
       handleQueryChange,
       results,
+      stages,
       isLoading,
+      isStreaming,
       error,
       aiAnswer,
       metadata,
@@ -379,6 +383,8 @@ export const MixpeekSearch: React.FC<MixpeekSearchProps> = ({
           query={query}
           onQueryChange={handleQueryChange}
           results={results}
+          stages={stages}
+          isStreaming={isStreaming}
           isLoading={isLoading}
           error={error}
           aiAnswer={aiAnswer}

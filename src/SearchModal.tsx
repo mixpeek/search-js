@@ -7,7 +7,7 @@ import { ZeroResults } from "./ZeroResults";
 import { PoweredBy } from "./PoweredBy";
 import { ShareLink } from "./ShareLink";
 import { IntentCTA } from "./IntentCTA";
-import { SearchResult, AIAnswerData, SearchResponseMetadata, CTAConfig } from "./types";
+import { SearchResult, AIAnswerData, SearchResponseMetadata, CTAConfig, StageGroup } from "./types";
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -15,6 +15,8 @@ interface SearchModalProps {
   query: string;
   onQueryChange: (query: string) => void;
   results: SearchResult[];
+  stages: StageGroup[];
+  isStreaming: boolean;
   isLoading: boolean;
   error: string | null;
   aiAnswer: AIAnswerData | null;
@@ -36,6 +38,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   query,
   onQueryChange,
   results,
+  stages,
+  isStreaming,
   isLoading,
   error,
   aiAnswer,
@@ -137,8 +141,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({
 
   const showRecent = !query && recentSearches.length > 0;
   const showEmpty = !query && recentSearches.length === 0;
-  const showZeroResults = query.trim() && !isLoading && results.length === 0 && !error;
-  const showResults = results.length > 0;
+  const showZeroResults = query.trim() && !isLoading && !isStreaming && results.length === 0 && !error;
+  const showResults = results.length > 0 || stages.length > 0;
   const showAIAnswer = enableAIAnswer && aiAnswer && aiAnswer.answer;
   const effectiveCTA = ctaConfig || metadata?.cta;
 
@@ -258,6 +262,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({
           {showResults && (
             <SearchResults
               results={results}
+              stages={stages}
+              isStreaming={isStreaming}
               query={query}
               isLoading={isLoading}
               onResultClick={onResultClick}

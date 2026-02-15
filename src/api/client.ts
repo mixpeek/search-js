@@ -1,4 +1,4 @@
-import { SearchResponse, SearchResult } from "../types";
+import { SearchResponse, SearchResult, StageEvent } from "../types";
 
 const DEFAULT_BASE_URL = "https://api.mixpeek.com";
 
@@ -112,12 +112,9 @@ export class MixpeekClient {
   }
 
   /**
-   * Execute a streaming search query. Yields partial AI answer chunks.
+   * Execute a streaming search query. Yields StageEvent objects as the pipeline executes.
    */
-  async *searchStream(params: SearchParams): AsyncGenerator<{
-    type: "answer_chunk" | "results" | "done";
-    data: unknown;
-  }> {
+  async *searchStream(params: SearchParams): AsyncGenerator<StageEvent> {
     this.cancel();
     this.abortController = new AbortController();
 
@@ -163,20 +160,12 @@ export class MixpeekClient {
           if (!trimmed || !trimmed.startsWith("data: ")) continue;
 
           const payload = trimmed.slice(6);
-          if (payload === "[DONE]") {
-            yield { type: "done", data: null };
-            return;
-          }
+          if (payload === "[DONE]") return;
 
           try {
             const parsed = JSON.parse(payload);
-            if (parsed.answer_chunk) {
-              yield { type: "answer_chunk", data: parsed.answer_chunk };
-            } else if (parsed.results || parsed.documents) {
-              yield {
-                type: "results",
-                data: parsed.results || parsed.documents,
-              };
+            if (parsed.event_type) {
+              yield parsed as StageEvent;
             }
           } catch {
             // Skip unparseable SSE lines

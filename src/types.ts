@@ -133,6 +133,10 @@ export interface SearchContextValue {
   toggle: () => void;
   /** Perform a search */
   search: (query: string) => Promise<void>;
+  /** Pipeline stages (populated during streaming) */
+  stages: StageGroup[];
+  /** Whether results are currently streaming */
+  isStreaming: boolean;
   /** Recent search queries */
   recentSearches: string[];
   /** Clear recent searches */
@@ -158,4 +162,40 @@ export interface MixpeekSearchConfig {
 export interface RecentSearch {
   query: string;
   timestamp: number;
+}
+
+/* ---------- Streaming / Pipeline Types ---------- */
+
+export interface StageEvent {
+  event_type:
+    | "stage_start"
+    | "stage_complete"
+    | "stage_error"
+    | "execution_complete"
+    | "execution_error";
+  execution_id: string;
+  stage_name?: string;
+  stage_index?: number;
+  total_stages?: number;
+  statistics?: StageStatistics;
+  documents?: SearchResult[];
+  budget_used?: Record<string, unknown>;
+  pagination?: Record<string, unknown>;
+  error?: string;
+}
+
+export interface StageStatistics {
+  input_count?: number;
+  output_count?: number;
+  duration_ms?: number;
+  efficiency?: number;
+}
+
+export interface StageGroup {
+  name: string;
+  index: number;
+  status: "pending" | "running" | "complete" | "error";
+  documents: SearchResult[];
+  statistics?: StageStatistics;
+  error?: string;
 }
