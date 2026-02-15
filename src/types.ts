@@ -59,7 +59,7 @@ export interface FilterPanelConfig {
   filters: FilterConfig[];
 }
 
-export interface MixpeekSearchProps {
+export interface SearchKitProps {
   /** Project key: either a `ret_sk_` API key or a public retriever slug name */
   projectKey: string;
   /** Placeholder text for the search input */
@@ -202,7 +202,7 @@ export interface SearchContextValue {
   /** Clear recent searches */
   clearRecentSearches: () => void;
   /** Configuration */
-  config: MixpeekSearchConfig;
+  config: SearchKitConfig;
   /** Current filter inputs */
   filterInputs: Record<string, unknown>;
   /** Set a filter value (pass null/undefined to remove) */
@@ -215,7 +215,7 @@ export interface SearchContextValue {
   hasActiveFilters: boolean;
 }
 
-export interface MixpeekSearchConfig {
+export interface SearchKitConfig {
   projectKey: string;
   retrieverSlug?: string;
   apiBaseUrl: string;

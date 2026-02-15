@@ -1,29 +1,31 @@
 /**
- * @mixpeek/search - Mixpeek-powered search widget for React applications.
+ * @mixpeek/react-searchkit - React component library for multimodal search.
+ *
+ * Composable search UI with stages streaming, AI answers, filters, and theming.
  *
  * @example React usage:
  * ```tsx
- * import { MixpeekSearch } from "@mixpeek/search";
- * import "@mixpeek/search/styles";
+ * import { SearchKit } from "@mixpeek/react-searchkit";
+ * import "@mixpeek/react-searchkit/styles.css";
  *
  * function App() {
- *   return <MixpeekSearch projectKey="my-retriever-slug" />;
+ *   return <SearchKit projectKey="my-retriever-slug" />;
  * }
  * ```
  *
  * @example CDN usage:
  * ```html
- * <script src="https://cdn.mixpeek.com/search/mixpeek-search.umd.js"></script>
+ * <script src="https://cdn.mixpeek.com/searchkit/v1/searchkit.umd.js"></script>
  * <div id="mixpeek-search" data-project-key="my-retriever-slug"></div>
  * ```
  */
 
 import type { FC } from "react";
-import { MixpeekSearch as MixpeekSearchComponent } from "./MixpeekSearch";
-import type { MixpeekSearchProps } from "./types";
+import { SearchKit as SearchKitComponent } from "./SearchKit";
+import type { SearchKitProps } from "./types";
 
 // Main component
-export { MixpeekSearch, useMixpeekSearch } from "./MixpeekSearch";
+export { SearchKit, MixpeekSearch, useSearchKit, useMixpeekSearch } from "./SearchKit";
 
 // Sub-components (for advanced composition)
 export { SearchButton } from "./SearchButton";
@@ -51,7 +53,8 @@ export { MixpeekClient } from "./api/client";
 
 // Types
 export type {
-  MixpeekSearchProps,
+  SearchKitProps,
+  SearchKitProps as MixpeekSearchProps,
   SearchResult,
   AIAnswerData,
   AIAnswerCitation,
@@ -59,7 +62,8 @@ export type {
   SearchResponseMetadata,
   CTAConfig,
   SearchContextValue,
-  MixpeekSearchConfig,
+  SearchKitConfig,
+  SearchKitConfig as MixpeekSearchConfig,
   ThemeMode,
   Position,
   RecentSearch,
@@ -80,7 +84,7 @@ export type {
 interface WindowWithReact extends Window {
   React?: {
     createElement: (
-      type: FC<MixpeekSearchProps>,
+      type: FC<SearchKitProps>,
       props: Record<string, unknown>
     ) => unknown;
   };
@@ -104,8 +108,8 @@ function autoInit(): void {
 
   if (!ReactLib || !ReactDOMLib) {
     console.warn(
-      "[@mixpeek/search] Auto-init requires React and ReactDOM as globals. " +
-        "Include React before the Mixpeek Search script, or use the npm package instead."
+      "[@mixpeek/react-searchkit] Auto-init requires React and ReactDOM as globals. " +
+        "Include React before the SearchKit script, or use the npm package instead."
     );
     return;
   }
@@ -145,7 +149,7 @@ function autoInit(): void {
     if (ReactDOMLib.createRoot) {
       const root = ReactDOMLib.createRoot(container);
       root.render(
-        ReactLib.createElement(MixpeekSearchComponent, props)
+        ReactLib.createElement(SearchKitComponent, props)
       );
     }
   });

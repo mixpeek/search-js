@@ -141,8 +141,8 @@ async function createRetriever() {
   console.log(`  Slug: ${retrieverSlug}`);
   console.log(`  Namespace: ${namespace}`);
   console.log(`  Stages: feature_search → attribute_filter → rag_prepare`);
-  console.log(`\nUsage with the search widget:\n`);
-  console.log(`  <MixpeekSearch projectKey="${retrieverSlug}" />`);
+  console.log(`\nUsage with SearchKit:\n`);
+  console.log(`  <SearchKit projectKey="${retrieverSlug}" />`);
   console.log("");
 }
 

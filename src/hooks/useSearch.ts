@@ -4,12 +4,12 @@ import {
   SearchResult,
   AIAnswerData,
   SearchResponseMetadata,
-  MixpeekSearchConfig,
+  SearchKitConfig,
   StageGroup,
 } from "../types";
 
 interface UseSearchOptions {
-  config: MixpeekSearchConfig;
+  config: SearchKitConfig;
   filterInputs?: Record<string, unknown>;
   onSearch?: (query: string) => void;
   onSearchExecuted?: (query: string) => void;

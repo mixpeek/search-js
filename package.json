@@ -1,14 +1,14 @@
 {
-  "name": "@mixpeek/search-js",
+  "name": "@mixpeek/react-searchkit",
   "version": "0.1.1",
-  "description": "Drop-in multimodal search widget — add AI-powered search to any site in 6 lines of code",
-  "main": "dist/mixpeek-search.cjs.js",
-  "module": "dist/mixpeek-search.esm.js",
+  "description": "React component library for multimodal search — stages streaming, AI answers, and composable search UI",
+  "main": "dist/searchkit.cjs.js",
+  "module": "dist/searchkit.esm.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/mixpeek-search.esm.js",
-      "require": "./dist/mixpeek-search.cjs.js",
+      "import": "./dist/searchkit.esm.js",
+      "require": "./dist/searchkit.cjs.js",
       "types": "./dist/index.d.ts"
     },
     "./styles.css": "./dist/style.css"
@@ -46,12 +46,13 @@
   },
   "keywords": [
     "mixpeek",
-    "search",
-    "search-widget",
+    "searchkit",
+    "react-searchkit",
     "react",
     "multimodal-search",
     "ai-search",
-    "docsearch",
+    "search-component",
+    "streaming-search",
     "site-search",
     "cmd-k",
     "semantic-search"
@@ -60,10 +61,10 @@
   "author": "Mixpeek <hello@mixpeek.com> (https://mixpeek.com)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mixpeek/search-js.git"
+    "url": "https://github.com/mixpeek/react-searchkit.git"
   },
-  "homepage": "https://mixpeek.com/search",
+  "homepage": "https://mxp.co/searchkit",
   "bugs": {
-    "url": "https://github.com/mixpeek/search-js/issues"
+    "url": "https://github.com/mixpeek/react-searchkit/issues"
   }
 }

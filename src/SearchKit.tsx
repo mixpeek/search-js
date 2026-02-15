@@ -7,9 +7,9 @@ import React, {
   useContext,
 } from "react";
 import {
-  MixpeekSearchProps,
+  SearchKitProps,
   SearchContextValue,
-  MixpeekSearchConfig,
+  SearchKitConfig,
 } from "./types";
 import { SearchButton } from "./SearchButton";
 import { SearchModal } from "./SearchModal";
@@ -22,33 +22,35 @@ import "./styles/search.css";
 const SearchContext = createContext<SearchContextValue | null>(null);
 
 /**
- * Hook to access the MixpeekSearch context from child components.
+ * Hook to access the SearchKit context from child components.
  */
-export function useMixpeekSearch(): SearchContextValue {
+export function useSearchKit(): SearchContextValue {
   const ctx = useContext(SearchContext);
   if (!ctx) {
     throw new Error(
-      "useMixpeekSearch must be used within a MixpeekSearch component"
+      "useSearchKit must be used within a SearchKit component"
     );
   }
   return ctx;
 }
 
+/** @deprecated Use useSearchKit instead */
+export const useMixpeekSearch = useSearchKit;
+
 /**
- * MixpeekSearch - Main search widget component.
+ * SearchKit - React component library for multimodal search.
  *
- * Renders a search button that opens a search modal when clicked.
- * Supports keyboard shortcuts (Cmd+K / Ctrl+K), deep linking via query params,
- * AI answers, recent searches, and theming.
+ * Renders a search button that opens a search modal with stages streaming,
+ * AI answers, filters, recent searches, and theming.
  *
  * @example
  * ```tsx
- * <MixpeekSearch projectKey="my-retriever-slug" />
+ * <SearchKit projectKey="my-retriever-slug" />
  * ```
  *
  * @example
  * ```tsx
- * <MixpeekSearch
+ * <SearchKit
  *   projectKey="ret_sk_abc123"
  *   theme="dark"
  *   placeholder="Search documentation..."
@@ -57,7 +59,7 @@ export function useMixpeekSearch(): SearchContextValue {
  * />
  * ```
  */
-export const MixpeekSearch: React.FC<MixpeekSearchProps> = ({
+export const SearchKit: React.FC<SearchKitProps> = ({
   projectKey,
   placeholder = "Search...",
   maxResults = 10,
@@ -84,7 +86,7 @@ export const MixpeekSearch: React.FC<MixpeekSearchProps> = ({
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [query, setQuery] = useState("");
 
-  const config: MixpeekSearchConfig = useMemo(
+  const config: SearchKitConfig = useMemo(
     () => ({
       projectKey,
       retrieverSlug,
@@ -442,4 +444,7 @@ function hexToRgb(hex: string): string {
   return `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`;
 }
 
-export default MixpeekSearch;
+/** @deprecated Use SearchKit instead */
+export const MixpeekSearch = SearchKit;
+
+export default SearchKit;

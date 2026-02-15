@@ -14,12 +14,12 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
-      name: "MixpeekSearch",
+      name: "SearchKit",
       formats: ["es", "cjs", "umd"],
       fileName: (format) => {
-        if (format === "es") return "mixpeek-search.esm.js";
-        if (format === "cjs") return "mixpeek-search.cjs.js";
-        return "mixpeek-search.umd.js";
+        if (format === "es") return "searchkit.esm.js";
+        if (format === "cjs") return "searchkit.cjs.js";
+        return "searchkit.umd.js";
       },
     },
     rollupOptions: {
@@ -27,7 +27,7 @@ export default defineConfig({
       output: [
         {
           format: "es",
-          entryFileNames: "mixpeek-search.esm.js",
+          entryFileNames: "searchkit.esm.js",
           exports: "named",
           globals: {
             react: "React",
@@ -37,7 +37,7 @@ export default defineConfig({
         },
         {
           format: "cjs",
-          entryFileNames: "mixpeek-search.cjs.js",
+          entryFileNames: "searchkit.cjs.js",
           exports: "named",
           globals: {
             react: "React",
@@ -47,8 +47,8 @@ export default defineConfig({
         },
         {
           format: "umd",
-          name: "MixpeekSearch",
-          entryFileNames: "mixpeek-search.umd.js",
+          name: "SearchKit",
+          entryFileNames: "searchkit.umd.js",
           exports: "named",
           globals: {
             react: "React",
