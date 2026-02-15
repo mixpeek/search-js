@@ -10,6 +10,7 @@ import {
 
 interface UseSearchOptions {
   config: MixpeekSearchConfig;
+  filterInputs?: Record<string, unknown>;
   onSearch?: (query: string) => void;
   onSearchExecuted?: (query: string) => void;
   onZeroResults?: (query: string) => void;
@@ -36,8 +37,11 @@ const resultCache = new Map<string, {
 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
-function getCacheKey(projectKey: string, query: string, limit: number): string {
-  return `${projectKey}:${query}:${limit}`;
+function getCacheKey(projectKey: string, query: string, limit: number, filterInputs?: Record<string, unknown>): string {
+  const filterStr = filterInputs && Object.keys(filterInputs).length > 0
+    ? `:${JSON.stringify(filterInputs)}`
+    : "";
+  return `${projectKey}:${query}:${limit}${filterStr}`;
 }
 
 function cleanCache(): void {
@@ -50,7 +54,7 @@ function cleanCache(): void {
 }
 
 export function useSearch(options: UseSearchOptions): UseSearchReturn {
-  const { config, onSearch, onSearchExecuted, onZeroResults, transformResults } = options;
+  const { config, filterInputs, onSearch, onSearchExecuted, onZeroResults, transformResults } = options;
 
   const [results, setResults] = useState<SearchResult[]>([]);
   const [stages, setStages] = useState<StageGroup[]>([]);
@@ -94,7 +98,7 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
       }
 
       // Check cache
-      const cacheKey = getCacheKey(config.projectKey, trimmed, config.maxResults);
+      const cacheKey = getCacheKey(config.projectKey, trimmed, config.maxResults, filterInputs);
       cleanCache();
       const cached = resultCache.get(cacheKey);
       if (cached) {
@@ -123,7 +127,7 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
 
         let finalResults: SearchResult[] = [];
 
-        for await (const event of client.searchStream({ query: trimmed, limit: config.maxResults })) {
+        for await (const event of client.searchStream({ query: trimmed, limit: config.maxResults, inputs: filterInputs })) {
           switch (event.event_type) {
             case "stage_start":
               setStages((prev) => {
@@ -221,6 +225,7 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
           const response = await client.search({
             query: trimmed,
             limit: config.maxResults,
+            inputs: filterInputs,
           });
 
           const rawResults = response.results || [];
@@ -260,7 +265,7 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
         setIsStreaming(false);
       }
     },
-    [config.projectKey, config.maxResults, config.apiBaseUrl, onSearch, onSearchExecuted, onZeroResults, transformResults]
+    [config.projectKey, config.maxResults, config.apiBaseUrl, filterInputs, onSearch, onSearchExecuted, onZeroResults, transformResults]
   );
 
   const search = useCallback(

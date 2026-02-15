@@ -13,8 +13,12 @@
     },
     "./styles.css": "./dist/style.css"
   },
+  "bin": {
+    "mixpeek-bootstrap": "./scripts/bootstrap.mjs"
+  },
   "files": [
-    "dist"
+    "dist",
+    "scripts"
   ],
   "sideEffects": [
     "**/*.css"

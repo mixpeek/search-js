@@ -37,8 +37,12 @@ export { ShareLink } from "./ShareLink";
 export { ZeroResults } from "./ZeroResults";
 export { IntentCTA } from "./IntentCTA";
 
+// Filter components
+export { FilterPanel, FacetFilter, RangeFilter, SmartFilter } from "./filters";
+
 // Hooks
 export { useSearch } from "./hooks/useSearch";
+export { useFilters } from "./hooks/useFilters";
 export { useKeyboardShortcut } from "./hooks/useKeyboardShortcut";
 export { useRecentSearches } from "./hooks/useRecentSearches";
 
@@ -62,6 +66,12 @@ export type {
   StageEvent,
   StageStatistics,
   StageGroup,
+  FacetOption,
+  FacetFilterConfig,
+  RangeFilterConfig,
+  SmartFilterConfig,
+  FilterConfig,
+  FilterPanelConfig,
 } from "./types";
 
 // ---------- CDN Auto-Init ----------

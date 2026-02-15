@@ -3,6 +3,62 @@ import { ReactNode } from "react";
 export type ThemeMode = "light" | "dark" | "auto";
 export type Position = "modal" | "inline";
 
+/* ---------- Filter Types ---------- */
+
+export interface FacetOption {
+  /** Display label */
+  label: string;
+  /** Value sent to the API */
+  value: string;
+  /** Optional count badge */
+  count?: number;
+}
+
+export interface FacetFilterConfig {
+  type: "facet";
+  /** Field name used as the input key (e.g. "category") */
+  field: string;
+  /** Display label */
+  label: string;
+  /** Available options */
+  options: FacetOption[];
+  /** Allow multiple selections (default: false) */
+  multiple?: boolean;
+}
+
+export interface RangeFilterConfig {
+  type: "range";
+  /** Field name prefix — emits min_<field> and max_<field> */
+  field: string;
+  /** Display label */
+  label: string;
+  /** Minimum value */
+  min: number;
+  /** Maximum value */
+  max: number;
+  /** Step increment (default: 1) */
+  step?: number;
+  /** Unit prefix for display (e.g. "$") */
+  unit?: string;
+}
+
+export interface SmartFilterConfig {
+  type: "smart";
+  /** Display label */
+  label?: string;
+  /** Placeholder text */
+  placeholder?: string;
+}
+
+export type FilterConfig = FacetFilterConfig | RangeFilterConfig | SmartFilterConfig;
+
+export interface FilterPanelConfig {
+  /** Panel title */
+  title?: string;
+  /** Filter definitions */
+  filters: FilterConfig[];
+}
+
 export interface MixpeekSearchProps {
   /** Project key: either a `ret_sk_` API key or a public retriever slug name */
   projectKey: string;
@@ -44,6 +100,10 @@ export interface MixpeekSearchProps {
   defaultOpen?: boolean;
   /** CTA configuration for enterprise intent capture */
   ctaConfig?: CTAConfig;
+  /** Default filter values to apply on mount */
+  defaultFilters?: Record<string, unknown>;
+  /** Callback when filter inputs change */
+  onFilterChange?: (filterInputs: Record<string, unknown>) => void;
 }
 
 export interface SearchResult {
@@ -143,6 +203,16 @@ export interface SearchContextValue {
   clearRecentSearches: () => void;
   /** Configuration */
   config: MixpeekSearchConfig;
+  /** Current filter inputs */
+  filterInputs: Record<string, unknown>;
+  /** Set a filter value (pass null/undefined to remove) */
+  setFilter: (field: string, value: unknown) => void;
+  /** Remove a filter by field name */
+  removeFilter: (field: string) => void;
+  /** Clear all active filters */
+  clearFilters: () => void;
+  /** Whether any filters are currently active */
+  hasActiveFilters: boolean;
 }
 
 export interface MixpeekSearchConfig {

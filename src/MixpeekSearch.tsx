@@ -14,6 +14,7 @@ import {
 import { SearchButton } from "./SearchButton";
 import { SearchModal } from "./SearchModal";
 import { useSearch } from "./hooks/useSearch";
+import { useFilters } from "./hooks/useFilters";
 import { useKeyboardShortcut } from "./hooks/useKeyboardShortcut";
 import { useRecentSearches } from "./hooks/useRecentSearches";
 import "./styles/search.css";
@@ -77,6 +78,8 @@ export const MixpeekSearch: React.FC<MixpeekSearchProps> = ({
   className,
   defaultOpen = false,
   ctaConfig,
+  defaultFilters,
+  onFilterChange,
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [query, setQuery] = useState("");
@@ -113,13 +116,29 @@ export const MixpeekSearch: React.FC<MixpeekSearchProps> = ({
   const { recentSearches, addSearch, clearRecentSearches } =
     useRecentSearches();
 
+  const { filterInputs, setFilter, removeFilter, clearFilters, hasActiveFilters } =
+    useFilters(defaultFilters);
+
   const { results, stages, isLoading, isStreaming, error, aiAnswer, metadata, search } = useSearch({
     config,
+    filterInputs,
     onSearch,
     onSearchExecuted: addSearch,
     onZeroResults,
     transformResults,
   });
+
+  // Re-trigger search when filters change
+  useEffect(() => {
+    if (query.trim()) {
+      search(query);
+    }
+  }, [filterInputs]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Notify parent of filter changes
+  useEffect(() => {
+    onFilterChange?.(filterInputs);
+  }, [filterInputs]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Open/close handlers
   const open = useCallback(() => setIsOpen(true), []);
@@ -196,6 +215,11 @@ export const MixpeekSearch: React.FC<MixpeekSearchProps> = ({
       recentSearches,
       clearRecentSearches,
       config,
+      filterInputs,
+      setFilter,
+      removeFilter,
+      clearFilters,
+      hasActiveFilters,
     }),
     [
       query,
@@ -215,6 +239,11 @@ export const MixpeekSearch: React.FC<MixpeekSearchProps> = ({
       recentSearches,
       clearRecentSearches,
       config,
+      filterInputs,
+      setFilter,
+      removeFilter,
+      clearFilters,
+      hasActiveFilters,
     ]
   );
 

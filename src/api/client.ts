@@ -13,6 +13,7 @@ interface SearchParams {
   query: string;
   limit?: number;
   stream?: boolean;
+  inputs?: Record<string, unknown>;
 }
 
 export class MixpeekClient {
@@ -70,7 +71,7 @@ export class MixpeekClient {
     this.abortController = new AbortController();
 
     const body: Record<string, unknown> = {
-      inputs: { query: params.query },
+      inputs: { query: params.query, ...params.inputs },
       settings: { limit: params.limit || 10 },
     };
 
@@ -119,7 +120,7 @@ export class MixpeekClient {
     this.abortController = new AbortController();
 
     const body: Record<string, unknown> = {
-      inputs: { query: params.query },
+      inputs: { query: params.query, ...params.inputs },
       settings: { limit: params.limit || 10 },
       stream: true,
     };
