@@ -61,10 +61,10 @@
   "author": "Mixpeek <hello@mixpeek.com> (https://mixpeek.com)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mixpeek/react-searchkit.git"
+    "url": "https://github.com/mixpeek/searchkit.git"
   },
   "homepage": "https://mxp.co/searchkit",
   "bugs": {
-    "url": "https://github.com/mixpeek/react-searchkit/issues"
+    "url": "https://github.com/mixpeek/searchkit/issues"
   }
 }
