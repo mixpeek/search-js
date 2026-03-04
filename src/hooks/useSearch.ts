@@ -72,12 +72,14 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
       projectKey: config.projectKey,
       baseUrl: config.apiBaseUrl,
       retrieverSlug: config.retrieverSlug,
+      bearerToken: config.bearerToken,
+      namespaceId: config.namespaceId,
     });
 
     return () => {
       clientRef.current?.cancel();
     };
-  }, [config.projectKey, config.apiBaseUrl, config.retrieverSlug]);
+  }, [config.projectKey, config.apiBaseUrl, config.retrieverSlug, config.bearerToken, config.namespaceId]);
 
   const executeSearch = useCallback(
     async (query: string) => {

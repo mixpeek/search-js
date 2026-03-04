@@ -59,9 +59,54 @@ export interface FilterPanelConfig {
   filters: FilterConfig[];
 }
 
+/* ---------- Pipeline Configuration Types ---------- */
+
+export interface PipelineInputField {
+  /** Input field name — maps to {{INPUT.fieldname}} in the retriever */
+  field: string;
+  /** Display label */
+  label: string;
+  /** Input type */
+  type: "text" | "select" | "boolean" | "number";
+  /** Placeholder text (for text/number inputs) */
+  placeholder?: string;
+  /** Options list (for select inputs) */
+  options?: Array<{ label: string; value: string }>;
+  /** Default value */
+  defaultValue?: unknown;
+}
+
+export interface RetrieverPipelineConfig {
+  /**
+   * Pre-filter input fields — rendered as form controls in the pipeline panel.
+   * Values are sent as INPUT parameters to the retriever (e.g. doc_type, keyword).
+   */
+  preFilters?: PipelineInputField[];
+  /**
+   * RAG prepare stage configuration.
+   * When enabled, passes rag settings as INPUT parameters to the retriever.
+   */
+  ragPrepare?: {
+    /** Whether the RAG prepare toggle is available */
+    enabled?: boolean;
+    /** Default context token limit */
+    defaultMaxContextTokens?: number;
+  };
+  /** Show the pipeline configuration panel (default: true when preFilters or ragPrepare is set) */
+  showPanel?: boolean;
+  /** Panel title (default: "Pipeline") */
+  panelTitle?: string;
+}
+
 export interface SearchKitProps {
   /** Project key: either a `ret_sk_` API key or a public retriever slug name */
   projectKey: string;
+  /**
+   * Namespace ID for multi-tenant routing (`ns_...`).
+   * Required when using `bearerToken` mode (private retriever IDs).
+   * Sent as the `X-Namespace` header on every API request.
+   */
+  namespaceId?: string;
   /** Placeholder text for the search input */
   placeholder?: string;
   /** Maximum number of results to show */
@@ -92,6 +137,12 @@ export interface SearchKitProps {
   renderResult?: (result: SearchResult, index: number) => ReactNode;
   /** When using a ret_sk_ key, the public retriever slug for the endpoint URL */
   retrieverSlug?: string;
+  /**
+   * Bearer token for private API access (local dev / self-hosted).
+   * When set, `projectKey` must be a retriever ID (e.g. `ret_9a8a8d76062f87`).
+   * Requests go to `/v1/retrievers/{projectKey}/execute` with `Authorization: Bearer <bearerToken>`.
+   */
+  bearerToken?: string;
   /** Custom API base URL */
   apiBaseUrl?: string;
   /** Additional CSS class name */
@@ -104,6 +155,11 @@ export interface SearchKitProps {
   defaultFilters?: Record<string, unknown>;
   /** Callback when filter inputs change */
   onFilterChange?: (filterInputs: Record<string, unknown>) => void;
+  /**
+   * Pipeline stage configuration — lets users configure pre-filter inputs and
+   * RAG prepare settings directly from the search widget UI.
+   */
+  pipelineConfig?: RetrieverPipelineConfig;
 }
 
 export interface SearchResult {
@@ -217,7 +273,9 @@ export interface SearchContextValue {
 
 export interface SearchKitConfig {
   projectKey: string;
+  namespaceId?: string;
   retrieverSlug?: string;
+  bearerToken?: string;
   apiBaseUrl: string;
   maxResults: number;
   theme: ThemeMode;
@@ -227,6 +285,7 @@ export interface SearchKitConfig {
   enableShareLinks: boolean;
   enableAIAnswer: boolean;
   position: Position;
+  pipelineConfig?: RetrieverPipelineConfig;
 }
 
 export interface RecentSearch {

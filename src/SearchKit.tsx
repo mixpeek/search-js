@@ -10,6 +10,7 @@ import {
   SearchKitProps,
   SearchContextValue,
   SearchKitConfig,
+  RetrieverPipelineConfig,
 } from "./types";
 import { SearchButton } from "./SearchButton";
 import { SearchModal } from "./SearchModal";
@@ -61,6 +62,7 @@ export const useMixpeekSearch = useSearchKit;
  */
 export const SearchKit: React.FC<SearchKitProps> = ({
   projectKey,
+  namespaceId,
   placeholder = "Search...",
   maxResults = 10,
   theme = "auto",
@@ -76,12 +78,14 @@ export const SearchKit: React.FC<SearchKitProps> = ({
   transformResults,
   renderResult,
   retrieverSlug,
+  bearerToken,
   apiBaseUrl = "https://api.mixpeek.com",
   className,
   defaultOpen = false,
   ctaConfig,
   defaultFilters,
   onFilterChange,
+  pipelineConfig,
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [query, setQuery] = useState("");
@@ -89,7 +93,9 @@ export const SearchKit: React.FC<SearchKitProps> = ({
   const config: SearchKitConfig = useMemo(
     () => ({
       projectKey,
+      namespaceId,
       retrieverSlug,
+      bearerToken,
       apiBaseUrl,
       maxResults,
       theme,
@@ -99,10 +105,13 @@ export const SearchKit: React.FC<SearchKitProps> = ({
       enableShareLinks,
       enableAIAnswer,
       position,
+      pipelineConfig,
     }),
     [
       projectKey,
+      namespaceId,
       retrieverSlug,
+      bearerToken,
       apiBaseUrl,
       maxResults,
       theme,
@@ -112,6 +121,7 @@ export const SearchKit: React.FC<SearchKitProps> = ({
       enableShareLinks,
       enableAIAnswer,
       position,
+      pipelineConfig,
     ]
   );
 
@@ -378,7 +388,7 @@ export const SearchKit: React.FC<SearchKitProps> = ({
                 <div className="mixpeek-modal-footer-right">
                   <a
                     className="mixpeek-powered-by"
-                    href="https://mixpeek.com/search"
+                    href="https://mxp.co/searchkit"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -430,6 +440,9 @@ export const SearchKit: React.FC<SearchKitProps> = ({
           renderResult={renderResult}
           ctaConfig={ctaConfig}
           theme={resolvedTheme}
+          pipelineConfig={pipelineConfig}
+          filterInputs={filterInputs}
+          onFilterChange={setFilter}
         />
       </div>
     </SearchContext.Provider>

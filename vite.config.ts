@@ -5,7 +5,7 @@ import { resolve } from "path";
 
 export default defineConfig({
   plugins: [
-    react(),
+    react({ jsxRuntime: "classic" }),
     dts({
       insertTypesEntry: true,
       include: ["src"],
@@ -23,7 +23,7 @@ export default defineConfig({
       },
     },
     rollupOptions: {
-      external: ["react", "react-dom", "react/jsx-runtime"],
+      external: ["react", "react-dom"],
       output: [
         {
           format: "es",
@@ -32,7 +32,6 @@ export default defineConfig({
           globals: {
             react: "React",
             "react-dom": "ReactDOM",
-            "react/jsx-runtime": "jsxRuntime",
           },
         },
         {
@@ -42,7 +41,6 @@ export default defineConfig({
           globals: {
             react: "React",
             "react-dom": "ReactDOM",
-            "react/jsx-runtime": "jsxRuntime",
           },
         },
         {
@@ -53,7 +51,6 @@ export default defineConfig({
           globals: {
             react: "React",
             "react-dom": "ReactDOM",
-            "react/jsx-runtime": "jsxRuntime",
           },
         },
       ],

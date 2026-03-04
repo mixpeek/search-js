@@ -42,6 +42,9 @@ export { IntentCTA } from "./IntentCTA";
 // Filter components
 export { FilterPanel, FacetFilter, RangeFilter, SmartFilter } from "./filters";
 
+// Pipeline config component
+export { PipelineConfig } from "./PipelineConfig";
+
 // Hooks
 export { useSearch } from "./hooks/useSearch";
 export { useFilters } from "./hooks/useFilters";
@@ -76,6 +79,8 @@ export type {
   SmartFilterConfig,
   FilterConfig,
   FilterPanelConfig,
+  PipelineInputField,
+  RetrieverPipelineConfig,
 } from "./types";
 
 // ---------- CDN Auto-Init ----------
@@ -128,6 +133,10 @@ function autoInit(): void {
       script.getAttribute("data-container") || "mixpeek-search";
     const accentColor =
       script.getAttribute("data-accent-color") || undefined;
+    const namespaceId =
+      script.getAttribute("data-namespace-id") || undefined;
+    const bearerToken =
+      script.getAttribute("data-bearer-token") || undefined;
 
     // Find or create the container
     let container = document.getElementById(containerId);
@@ -144,6 +153,8 @@ function autoInit(): void {
     };
     if (placeholder) props.placeholder = placeholder;
     if (accentColor) props.accentColor = accentColor;
+    if (namespaceId) props.namespaceId = namespaceId;
+    if (bearerToken) props.bearerToken = bearerToken;
 
     // Use createRoot for React 18+
     if (ReactDOMLib.createRoot) {

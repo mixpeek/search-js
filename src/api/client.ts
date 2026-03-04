@@ -7,6 +7,18 @@ interface MixpeekClientConfig {
   baseUrl?: string;
   /** When using a ret_sk_ key, specify the public retriever slug for the endpoint URL */
   retrieverSlug?: string;
+  /**
+   * Bearer token for private API access (local dev / self-hosted).
+   * When set, uses `Authorization: Bearer <bearerToken>` instead of the public key header,
+   * and routes directly to the private `/v1/retrievers/{id}/execute` endpoint.
+   */
+  bearerToken?: string;
+  /**
+   * Namespace ID for multi-tenant routing (`ns_...`).
+   * Sent as the `X-Namespace` header on every request.
+   * Required when using `bearerToken` mode; ignored for public slug requests.
+   */
+  namespaceId?: string;
 }
 
 interface SearchParams {
@@ -20,12 +32,16 @@ export class MixpeekClient {
   private projectKey: string;
   private baseUrl: string;
   private retrieverSlug: string | undefined;
+  private bearerToken: string | undefined;
+  private namespaceId: string | undefined;
   private abortController: AbortController | null = null;
 
   constructor(config: MixpeekClientConfig) {
     this.projectKey = config.projectKey;
     this.baseUrl = (config.baseUrl || DEFAULT_BASE_URL).replace(/\/+$/, "");
     this.retrieverSlug = config.retrieverSlug;
+    this.bearerToken = config.bearerToken;
+    this.namespaceId = config.namespaceId;
   }
 
   private isApiKey(): boolean {
@@ -36,13 +52,23 @@ export class MixpeekClient {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
-    if (this.isApiKey()) {
+    if (this.bearerToken) {
+      // Private/self-hosted: use Bearer auth
+      headers["Authorization"] = `Bearer ${this.bearerToken}`;
+    } else if (this.isApiKey()) {
       headers["X-Public-API-Key"] = this.projectKey;
+    }
+    if (this.namespaceId) {
+      headers["X-Namespace"] = this.namespaceId;
     }
     return headers;
   }
 
   private getEndpoint(): string {
+    // Private Bearer auth: route directly to the private execute endpoint
+    if (this.bearerToken) {
+      return `${this.baseUrl}/v1/retrievers/${encodeURIComponent(this.projectKey)}/execute`;
+    }
     if (this.isApiKey()) {
       // When using a ret_sk_ key with a known slug, use the named endpoint
       if (this.retrieverSlug) {
